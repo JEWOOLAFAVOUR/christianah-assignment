@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA Calculator - Nigerian University System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .course-inputs {
+            margin-bottom: 30px;
+        }
+
+        .course-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .course-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="text"] {
+            flex: 1.5;
+        }
+
+        input[type="number"] {
+            flex: 1;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #f8f9ff, #e8ecff);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .result-section.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cgpa-display {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .cgpa-value {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .cgpa-label {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .grade-class {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .class-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .class-description {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .courses-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .course-code {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .course-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .course-score {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .course-grade {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .grade-A {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .grade-B {
+            background: #cce5ff;
+            color: #0056b3;
+        }
+
+        .grade-C {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .grade-D {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .grade-E {
+            background: #f5c6cb;
+            color: #721c24;
+        }
+
+        .grade-F {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .course-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .course-number {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+
+            .input-group {
+                width: 100%;
+            }
+
+            .cgpa-value {
+                font-size: 2.5rem;
+            }
+
+            .courses-breakdown {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                margin: 10px;
+                max-width: 100%;
+            }
+
+            input[type="text"],
+            input[type="number"] {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .course-row {
+                margin-bottom: 15px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .input-group input {
+                width: 100%;
+            }
+
+            .calculate-btn {
+                padding: 15px;
+                font-size: 16px;
+            }
+
+            .result-section {
+                padding: 20px;
+            }
+
+            .cgpa-value {
+                font-size: 2rem;
+            }
+
+            .class-title {
+                font-size: 1.3rem;
+            }
+
+            .class-description {
+                font-size: 0.9rem;
+            }
+
+            .course-card {
+                padding: 12px;
+            }
+
+            .course-code {
+                font-size: 0.9rem;
+            }
+
+            .course-score {
+                font-size: 1rem;
+            }
+        }
+
+        /* Add additional breakpoint for very small devices */
+        @media (max-width: 320px) {
+            .container {
+                padding: 10px;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .input-group input {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">CGPA Calculator</h1>
+            <p class="subtitle">Nigerian University Grading System</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="course-inputs">
+            <div class="course-row">
+                <div class="course-number">1</div>
+                <div class="input-group">
+                    <input type="text" placeholder="Course Code (e.g., CSC 202)" id="course1Code">
+                    <input type="number" placeholder="Score (0-100)" id="course1Score" min="0" max="100">
+                </div>
+            </div>
+            <div class="course-row">
+                <div class="course-number">2</div>
+                <div class="input-group">
+                    <input type="text" placeholder="Course Code (e.g., CSC 204)" id="course2Code">
+                    <input type="number" placeholder="Score (0-100)" id="course2Score" min="0" max="100">
+                </div>
+            </div>
+            <div class="course-row">
+                <div class="course-number">3</div>
+                <div class="input-group">
+                    <input type="text" placeholder="Course Code (e.g., CSC 304)" id="course3Code">
+                    <input type="number" placeholder="Score (0-100)" id="course3Score" min="0" max="100">
+                </div>
+            </div>
+            <div class="course-row">
+                <div class="course-number">4</div>
+                <div class="input-group">
+                    <input type="text" placeholder="Course Code (e.g., CSC 409)" id="course4Code">
+                    <input type="number" placeholder="Score (0-100)" id="course4Score" min="0" max="100">
+                </div>
+            </div>
+            <div class="course-row">
+                <div class="course-number">5</div>
+                <div class="input-group">
+                    <input type="text" placeholder="Course Code (e.g., CSC 890)" id="course5Code">
+                    <input type="number" placeholder="Score (0-100)" id="course5Score" min="0" max="100">
+                </div>
+            </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculateCGPA()">
+            Calculate My CGPA
+        </button>
+
+        <div class="result-section" id="resultSection">
+            <div class="cgpa-display">
+                <div class="cgpa-value" id="cgpaValue">0.00</div>
+                <div class="cgpa-label">Cumulative Grade Point Average</div>
+            </div>
+
+            <div class="grade-class" id="gradeClass">
+                <div class="class-title" id="classTitle">-</div>
+                <div class="class-description" id="classDescription">Enter your scores to see your class of degree</div>
+            </div>
+
+            <div class="courses-breakdown" id="coursesBreakdown">
+                <!-- Course cards will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function convertScoreToGrade(score) {
+            if (score >= 70) return { points: 5, grade: 'A' };
+            if (score >= 60) return { points: 4, grade: 'B' };
+            if (score >= 50) return { points: 3, grade: 'C' };
+            if (score >= 45) return { points: 2, grade: 'D' };
+            if (score >= 40) return { points: 1, grade: 'E' };
+            return { points: 0, grade: 'F' };
+        }
+
+        function getClassOfDegree(cgpa) {
+            if (cgpa >= 4.50) return { title: 'First Class', description: 'Excellent! Outstanding academic performance.' };
+            if (cgpa >= 3.50) return { title: 'Second Class Upper', description: 'Very Good! Above average performance.' };
+            if (cgpa >= 2.40) return { title: 'Second Class Lower', description: 'Good! Average performance.' };
+            if (cgpa >= 1.50) return { title: 'Third Class', description: 'Pass! Below average performance.' };
+            if (cgpa >= 1.00) return { title: 'Pass', description: 'Pass! Minimum requirements met.' };
+            return { title: 'Fail', description: 'Unfortunately, minimum requirements not met.' };
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function calculateCGPA() {
+            const courses = [];
+            let totalPoints = 0;
+            let validCourses = 0;
+
+            // Collect course data
+            for (let i = 1; i <= 5; i++) {
+                const code = document.getElementById(`course${i}Code`).value.trim();
+                const score = parseFloat(document.getElementById(`course${i}Score`).value);
+
+                if (code && !isNaN(score)) {
+                    if (score < 0 || score > 100) {
+                        showError(`Score for ${code} must be between 0 and 100.`);
+                        return;
+                    }
+
+                    const gradeInfo = convertScoreToGrade(score);
+                    courses.push({
+                        code: code.toUpperCase(),
+                        score: score,
+                        points: gradeInfo.points,
+                        grade: gradeInfo.grade
+                    });
+                    totalPoints += gradeInfo.points;
+                    validCourses++;
+                } else if (code || !isNaN(score)) {
+                    showError('Please enter both course code and score for all courses, or leave both fields empty.');
+                    return;
+                }
+            }
+
+            if (validCourses === 0) {
+                showError('Please enter at least one course with code and score.');
+                return;
+            }
+
+            // Calculate CGPA
+            const cgpa = totalPoints / validCourses;
+            const classInfo = getClassOfDegree(cgpa);
+
+            // Update display
+            document.getElementById('cgpaValue').textContent = cgpa.toFixed(2);
+            document.getElementById('classTitle').textContent = classInfo.title;
+            document.getElementById('classDescription').textContent = classInfo.description;
+
+            // Update class styling based on performance
+            const gradeClassDiv = document.getElementById('gradeClass');
+            gradeClassDiv.className = 'grade-class';
+            if (cgpa >= 4.50) gradeClassDiv.style.background = 'linear-gradient(135deg, #d4edda, #c3e6cb)';
+            else if (cgpa >= 3.50) gradeClassDiv.style.background = 'linear-gradient(135deg, #cce5ff, #b3d9ff)';
+            else if (cgpa >= 2.40) gradeClassDiv.style.background = 'linear-gradient(135deg, #fff3cd, #ffeaa7)';
+            else if (cgpa >= 1.00) gradeClassDiv.style.background = 'linear-gradient(135deg, #f8d7da, #f5c6cb)';
+            else gradeClassDiv.style.background = 'linear-gradient(135deg, #f8d7da, #f5c6cb)';
+
+            // Create course breakdown cards
+            const breakdownDiv = document.getElementById('coursesBreakdown');
+            breakdownDiv.innerHTML = '';
+
+            courses.forEach(course => {
+                const courseCard = document.createElement('div');
+                courseCard.className = 'course-card';
+                courseCard.innerHTML = `
+                    <div class="course-code">${course.code}</div>
+                    <div class="course-details">
+                        <span class="course-score">${course.score}%</span>
+                        <span class="course-grade grade-${course.grade}">${course.grade} (${course.points})</span>
+                    </div>
+                `;
+                breakdownDiv.appendChild(courseCard);
+            });
+
+            // Show result section with animation
+            const resultSection = document.getElementById('resultSection');
+            resultSection.classList.add('show');
+        }
+
+        // Add enter key support
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                calculateCGPA();
+            }
+        });
+
+        // Auto-format course codes
+        for (let i = 1; i <= 5; i++) {
+            document.getElementById(`course${i}Code`).addEventListener('input', function (e) {
+                e.target.value = e.target.value.toUpperCase();
+            });
+        }
+    </script>
+</body>
+
+</html>
